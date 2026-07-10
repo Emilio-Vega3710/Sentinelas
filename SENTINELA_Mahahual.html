@@ -1,0 +1,1183 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
+<title>SENTINELA: El Equilibrio de Mahahual</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Questrial&family=Press+Start+2P&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --sea:#1FA8A8;
+    --sand:#E8C77E;
+    --jungle:#1F6E45;
+    --coral:#FF6B6B;
+    --sky:#BDEFF2;
+    --wood:#6B4226;
+    --navy:#0B2A4A;
+    --gold:#C9A54D;
+    --cv:#4FC0E8;
+    --sv:#7ED957;
+    --eco:#F2C94C;
+    --cam:#2ECC71;
+    --esp:#B983FF;
+    --ink:#0E2A2E;
+    --paper:#F4F1EA;
+    --danger:#D64545;
+    --font-body: 'Questrial', sans-serif;
+    --font-pixel: 'Press Start 2P', monospace;
+    --fs-base: clamp(14px, 1.6vw, 18px);
+    --fs-lg: clamp(18px, 2.4vw, 26px);
+    --fs-xl: clamp(22px, 3.6vw, 40px);
+    --fs-title: clamp(20px, 4.2vw, 46px);
+  }
+  *{box-sizing:border-box;}
+  html,body{
+    margin:0; padding:0; width:100%; height:100%;
+    background:#08181c;
+    font-family:var(--font-body);
+    font-size:var(--fs-base);
+    color:var(--paper);
+    overflow:hidden;
+    -webkit-font-smoothing:antialiased;
+  }
+  #app{
+    position:relative;
+    width:100vw; height:100vh;
+    display:flex; align-items:center; justify-content:center;
+    background:radial-gradient(ellipse at center, #123742 0%, #061418 100%);
+  }
+  .screen{
+    position:absolute; inset:0;
+    display:none;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    padding: clamp(12px, 3vw, 40px);
+    text-align:center;
+  }
+  .screen.active{ display:flex; }
+
+  /* ---------- TITLE ---------- */
+  #screen-title{ background:
+      linear-gradient(180deg, rgba(6,20,24,0.2), rgba(6,20,24,0.85)),
+      repeating-linear-gradient(45deg, #0d3b3b 0 8px, #0a2f2f 8px 16px);
+  }
+  .pixel-title{
+    font-family: var(--font-pixel);
+    font-size: var(--fs-title);
+    line-height:1.6;
+    color:#fff;
+    text-shadow: 4px 4px 0 #0a5c56, 8px 8px 0 rgba(0,0,0,0.35);
+    letter-spacing:2px;
+    margin-bottom: 0.4em;
+  }
+  .subtitle{
+    font-size: var(--fs-lg);
+    color: var(--sky);
+    margin-bottom: 2em;
+    max-width: 44em;
+  }
+  button.btn{
+    font-family: var(--font-body);
+    font-size: var(--fs-lg);
+    background: var(--coral);
+    color:#fff;
+    border:none;
+    padding: 0.7em 1.6em;
+    border-radius: 6px;
+    cursor:pointer;
+    box-shadow: 0 6px 0 #a83d3d, 0 8px 14px rgba(0,0,0,0.4);
+    transition: transform .08s ease;
+    image-rendering: pixelated;
+  }
+  button.btn:hover{ transform: translateY(-2px); }
+  button.btn:active{ transform: translateY(3px); box-shadow: 0 3px 0 #a83d3d; }
+  button.btn.ghost{
+    background:transparent;
+    border:2px solid var(--sky);
+    box-shadow:none;
+    color:var(--sky);
+  }
+
+  /* ---------- INTRO STORY ---------- */
+  #screen-intro{ background:#020c0e; }
+  #introCanvasWrap{
+    position:relative; width:min(96vw, 1100px); height:min(70vh, 620px);
+    border: 4px solid #0a2f2f; border-radius: 4px; overflow:hidden;
+    box-shadow: 0 0 0 4px #061418, 0 20px 60px rgba(0,0,0,0.6);
+  }
+  #introCanvas{ width:100%; height:100%; display:block; image-rendering:pixelated; }
+  #introTextBox{
+    position:absolute; left:0; right:0; bottom:0;
+    background: rgba(4,14,16,0.88);
+    border-top: 3px solid var(--gold);
+    padding: 1em 1.4em;
+    font-size: var(--fs-lg);
+    min-height: 4.6em;
+    text-align:left;
+  }
+  #introSkip{
+    position:absolute; top:10px; right:10px;
+    font-size: 0.7em;
+    opacity:0.7;
+  }
+
+  /* ---------- ROLE SELECT ---------- */
+  #screen-role{ background:#08181c; }
+  .role-wrap{
+    display:flex; width:100%; height:100%;
+  }
+  .role-panel{
+    flex:1; position:relative;
+    display:flex; flex-direction:column; align-items:center; justify-content:flex-end;
+    padding: clamp(16px,3vw,40px);
+    cursor:pointer;
+    transition: flex .3s ease, filter .3s ease;
+    overflow:hidden;
+  }
+  .role-panel:hover{ flex:1.25; filter:brightness(1.1); }
+  #panel-ciudadano{
+    background: linear-gradient(180deg, #2b5c4a 0%, #16332a 60%, #0e211c 100%);
+    border-right: 4px solid #0a2f2f;
+  }
+  #panel-inversionista{
+    background: linear-gradient(180deg, #0e2340 0%, #0a1830 60%, #060f1e 100%);
+  }
+  .role-label{
+    font-family: var(--font-pixel);
+    font-size: clamp(13px, 2vw, 20px);
+    margin-bottom: 0.6em;
+    padding: 0.5em 0.8em;
+    border-radius:4px;
+  }
+  #panel-ciudadano .role-label{ background:rgba(126,217,87,0.18); color:#c8f5c0; border:2px solid #7ED957; }
+  #panel-inversionista .role-label{ background:rgba(201,165,77,0.18); color:#ffe9b0; border:2px solid var(--gold); }
+  .role-portrait{ margin-bottom:0.6em; }
+  .role-text{
+    font-size: clamp(12px, 1.4vw, 16px);
+    max-width: 34em;
+    background: rgba(0,0,0,0.35);
+    padding: 0.8em 1em;
+    border-radius:6px;
+    text-align:left;
+    line-height:1.5;
+  }
+  .role-companion-name{ color: var(--gold); font-weight:bold; }
+
+  /* ---------- TUTORIAL / GAME ---------- */
+  #screen-game{ background:#08181c; }
+  #gameLayout{
+    width:100%; height:100%;
+    display:grid;
+    grid-template-rows: auto 1fr auto;
+  }
+  #hud{
+    display:flex; flex-wrap:wrap; gap: 0.6em;
+    justify-content:center;
+    padding: 0.6em 0.8em 0.3em;
+    background: rgba(4,14,16,0.55);
+  }
+  .stat{
+    width: clamp(90px, 15vw, 150px);
+    font-size: clamp(9px, 1.1vw, 12px);
+  }
+  .stat-label{ display:flex; justify-content:space-between; margin-bottom:2px; }
+  .stat-bar-bg{
+    width:100%; height:12px; background:#1a2f33; border-radius:6px; overflow:hidden;
+    border:1px solid rgba(255,255,255,0.15);
+  }
+  .stat-bar-fill{ height:100%; width:50%; transition:width .6s ease, background .6s ease; }
+
+  #mapWrap{
+    position:relative; display:flex; align-items:center; justify-content:center;
+    padding: 0.4em;
+    min-height:0;
+  }
+  #mapCanvas{
+    width:min(96vw, 900px); height:auto; aspect-ratio: 16/10;
+    image-rendering:pixelated;
+    border: 3px solid #0a2f2f; border-radius:4px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    filter: saturate(1) brightness(1);
+    transition: filter 1.2s ease;
+  }
+  #turnBadge{
+    position:absolute; top:6px; left:6px;
+    background:rgba(0,0,0,0.55); padding:4px 10px; border-radius:4px;
+    font-size: clamp(9px,1.1vw,12px); font-family: var(--font-pixel);
+  }
+
+  #dialogueBar{
+    background: rgba(4,14,16,0.92);
+    border-top: 3px solid var(--gold);
+    padding: 0.8em 1em;
+    min-height: 5em;
+  }
+  #companionRow{ display:flex; align-items:center; gap:0.6em; margin-bottom:0.4em; }
+  #companionName{ font-weight:bold; color:var(--gold); font-size: var(--fs-lg); }
+  #dialogueText{ font-size: var(--fs-base); text-align:left; max-width: 70em; margin:0 auto; line-height:1.5; min-height:2.6em; }
+
+  /* ---------- DECISION MODAL ---------- */
+  #decisionModal{
+    position:fixed; inset:0; background:rgba(2,8,10,0.82);
+    display:none; align-items:center; justify-content:center; z-index:50;
+    padding: clamp(10px,3vw,30px);
+  }
+  #decisionModal.active{ display:flex; }
+  #decisionCard{
+    background: var(--paper); color: var(--ink);
+    width:min(96vw, 820px); max-height:88vh; overflow-y:auto;
+    border-radius:10px; padding: clamp(14px,2.4vw,28px);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+    border: 4px solid var(--wood);
+  }
+  #decisionTitle{ font-family:var(--font-pixel); font-size: clamp(13px,2vw,18px); color:var(--navy); margin-bottom:0.5em; line-height:1.6;}
+  #decisionContext{ font-size: var(--fs-base); margin-bottom:0.8em; line-height:1.55; }
+  #decisionCompanion{ font-style:italic; font-size: var(--fs-base); margin-bottom:1em; padding:0.7em; background:#e9e2d0; border-left:4px solid var(--gold); border-radius:4px; }
+  .option{
+    text-align:left; width:100%; margin-bottom:0.8em;
+    background:#fff; border:2px solid #ccc; border-radius:8px;
+    padding: 0.8em 1em; cursor:pointer;
+    font-family:var(--font-body); font-size: var(--fs-base); color:var(--ink);
+  }
+  .option:hover{ border-color: var(--coral); box-shadow: 0 4px 10px rgba(0,0,0,0.15); }
+  .option-label{ font-weight:bold; margin-bottom:0.4em; display:block; }
+  .option-pros{ color:#1a7a3d; font-size:0.92em; }
+  .option-cons{ color:#a12a2a; font-size:0.92em; }
+
+  /* ---------- END SCREEN ---------- */
+  #screen-end{ background:#08181c; overflow-y:auto; }
+  #endCard{
+    max-width: 900px; width:92vw; text-align:left;
+    background: rgba(20,40,44,0.7); border-radius:10px;
+    padding: clamp(16px,3vw,32px); margin: 2vh auto;
+  }
+  #endTitle{ font-family:var(--font-pixel); font-size: clamp(16px,3vw,26px); text-align:center; margin-bottom:0.6em; }
+  #endSummary{ font-size: var(--fs-base); line-height:1.6; margin-bottom:1em; }
+  #endLog{ font-size: clamp(11px,1.3vw,14px); line-height:1.5; max-height: 34vh; overflow-y:auto; background:rgba(0,0,0,0.25); padding:0.8em; border-radius:6px; }
+  #endLog div{ margin-bottom:0.4em; border-bottom:1px dashed rgba(255,255,255,0.15); padding-bottom:0.3em; }
+  #endStatsFinal{ display:flex; flex-wrap:wrap; gap:0.8em; margin: 1em 0; justify-content:center; }
+
+  ::-webkit-scrollbar{ width:8px; }
+  ::-webkit-scrollbar-thumb{ background:var(--gold); border-radius:4px; }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- ===================== TITLE ===================== -->
+  <div class="screen active" id="screen-title">
+    <div class="pixel-title">SENTINELA</div>
+    <div class="subtitle">El Equilibrio de Mahahual — un simulador socioecológico por turnos</div>
+    <button class="btn" id="btnStart">INICIAR</button>
+  </div>
+
+  <!-- ===================== INTRO ===================== -->
+  <div class="screen" id="screen-intro">
+    <div id="introCanvasWrap">
+      <canvas id="introCanvas" width="880" height="550"></canvas>
+      <div id="introTextBox"><span id="introTextSpan"></span></div>
+      <button class="btn ghost" id="introSkip">Saltar ▶</button>
+    </div>
+  </div>
+
+  <!-- ===================== ROLE SELECT ===================== -->
+  <div class="screen" id="screen-role">
+    <div class="role-wrap">
+      <div class="role-panel" id="panel-ciudadano" data-role="ciudadano">
+        <canvas class="role-portrait" width="64" height="64" style="width:96px;height:96px;"></canvas>
+        <div class="role-label">🌊 JUGAR COMO CIUDADANO DEL PUEBLO</div>
+        <div class="role-text"><span class="role-companion-name">Elena (Trabajadora del Puerto):</span> "Tú vives en la costa y ves cómo cada nuevo hotel te roba espacio, contamina el agua y encarece la vida. Lo sé, es injusto. Pero yo trabajo en las tiendas del Puerto y si los inversionistas se van, mi familia y cientos de locales nos quedamos sin el único ingreso que hoy nos permite comprar comida. ¿Vas a defender tu hogar aunque eso signifique dejarnos sin sustento? Te toca decidir qué sacrificar."</div>
+      </div>
+      <div class="role-panel" id="panel-inversionista" data-role="inversionista">
+        <canvas class="role-portrait" width="64" height="64" style="width:96px;height:96px;"></canvas>
+        <div class="role-label">💼 JUGAR COMO INVERSIONISTA</div>
+        <div class="role-text"><span class="role-companion-name">Carlos (Asesor Técnico Ambiental):</span> "Estás aquí para ganar dinero, traer cadenas hoteleras y maximizar el turismo masivo. Mi trabajo como tu asesor es hacer que tus millones no se hundan. Cada vez que quieras ahorrar costos ignorando el cuidado del agua o destruyendo el manglar, te recordaré el precio real. La decisión final es tuya, pero si destruyes el arrecife por avaricia, tu inversión se quedará sin playas y sin turistas."</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== GAME ===================== -->
+  <div class="screen" id="screen-game">
+    <div id="gameLayout">
+      <div id="hud">
+        <div class="stat" data-key="CV"><div class="stat-label"><span>🟦 Calidad de Vida</span><span class="stat-val">50%</span></div><div class="stat-bar-bg"><div class="stat-bar-fill" style="background:var(--cv)"></div></div></div>
+        <div class="stat" data-key="SV"><div class="stat-label"><span>🚰 Servicios Básicos</span><span class="stat-val">50%</span></div><div class="stat-bar-bg"><div class="stat-bar-fill" style="background:var(--sv)"></div></div></div>
+        <div class="stat" data-key="ECO"><div class="stat-label"><span>💰 Economía</span><span class="stat-val">50%</span></div><div class="stat-bar-bg"><div class="stat-bar-fill" style="background:var(--eco)"></div></div></div>
+        <div class="stat" data-key="CAM"><div class="stat-label"><span>🌿 Amb. </span><span class="stat-val">50%</span></div><div class="stat-bar-bg"><div class="stat-bar-fill" style="background:var(--cam)"></div></div></div>
+        <div class="stat" data-key="ESP"><div class="stat-label"><span>🐠 Especies</span><span class="stat-val">50%</span></div><div class="stat-bar-bg"><div class="stat-bar-fill" style="background:var(--esp)"></div></div></div>
+      </div>
+      <div id="mapWrap">
+        <canvas id="mapCanvas" width="480" height="300"></canvas>
+        <div id="turnBadge">DÍA 0 / 16</div>
+      </div>
+      <div id="dialogueBar">
+        <div id="companionRow">
+          <canvas id="companionPortrait" width="24" height="24" style="width:36px;height:36px;image-rendering:pixelated;"></canvas>
+          <span id="companionName">—</span>
+        </div>
+        <div id="dialogueText"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== DECISION MODAL ===================== -->
+  <div id="decisionModal">
+    <div id="decisionCard">
+      <div id="decisionTitle"></div>
+      <div id="decisionContext"></div>
+      <div id="decisionCompanion"></div>
+      <div id="optionsWrap"></div>
+    </div>
+  </div>
+
+  <!-- ===================== END ===================== -->
+  <div class="screen" id="screen-end">
+    <div id="endCard">
+      <div id="endTitle"></div>
+      <div id="endStatsFinal"></div>
+      <div id="endSummary"></div>
+      <div id="endLog"></div>
+      <div style="text-align:center; margin-top:1.2em;">
+        <button class="btn" id="btnReplay">Jugar de nuevo</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+/* ============================================================
+   SENTINELA: El Equilibrio de Mahahual
+   Juego serio HTML5 / Canvas 2D — un solo archivo, sin servidor.
+   ============================================================ */
+
+/* ---------- ESTADO GLOBAL ---------- */
+const state = {
+  role: null,           // 'ciudadano' | 'inversionista'
+  bars: { CV:50, SV:50, ECO:50, CAM:50, ESP:50 },
+  turn: 0,
+  highStreak: 0,
+  log: [],
+  eventOrder: [],
+  finished: false
+};
+
+const STAT_META = {
+  CV:  { name:'Calidad de Vida',      color:'#4FC0E8' },
+  SV:  { name:'Servicios Básicos',    color:'#7ED957' },
+  ECO: { name:'Economía',             color:'#F2C94C' },
+  CAM: { name:'Calidad del Ambiente', color:'#2ECC71' },
+  ESP: { name:'Especies',             color:'#B983FF' }
+};
+
+/* ---------- UTILIDADES ---------- */
+function $(sel){ return document.querySelector(sel); }
+function $all(sel){ return document.querySelectorAll(sel); }
+function clamp(v,min,max){ return Math.max(min, Math.min(max, v)); }
+function showScreen(id){
+  $all('.screen').forEach(s => s.classList.remove('active'));
+  $('#'+id).classList.add('active');
+}
+
+/* ============================================================
+   PIXEL ART: retratos de personajes (bustos 8x8 escalados)
+   ============================================================ */
+const BUST_TEMPLATE = [
+ [0,0,1,1,1,1,0,0],
+ [0,1,1,1,1,1,1,0],
+ [0,1,2,2,2,2,1,0],
+ [0,1,2,2,2,2,1,0],
+ [0,1,2,2,2,2,1,0],
+ [0,0,2,2,2,2,0,0],
+ [0,4,4,4,4,4,4,0],
+ [4,4,4,4,4,4,4,4]
+];
+function drawBust(ctx, hairColor, skinColor, shirtColor, accentColor){
+  ctx.imageSmoothingEnabled = false;
+  const w = ctx.canvas.width / 8;
+  const h = ctx.canvas.height / 8;
+  const palette = {0:null, 1:hairColor, 2:skinColor, 4:shirtColor};
+  for(let y=0;y<8;y++){
+    for(let x=0;x<8;x++){
+      const c = palette[BUST_TEMPLATE[y][x]];
+      if(!c) continue;
+      ctx.fillStyle = c;
+      ctx.fillRect(x*w, y*h, w+0.5, h+0.5);
+    }
+  }
+  if(accentColor){
+    ctx.fillStyle = accentColor;
+    ctx.fillRect(5*w, 6*h, w, h); // gafete / detalle de pecho
+  }
+}
+const PORTRAITS = {
+  elena:      () => ['#3B2314','#D9A066','#7ED957','#F2C94C'],
+  carlos:     () => ['#1B1B1B','#C68863','#0B2A4A','#C9A54D'],
+  ciudadano:  () => ['#2B1A10','#E0A876','#2E7D4F','#ffffff'],
+  inversionista: () => ['#101010','#E0B48A','#0B2A4A','#C9A54D']
+};
+function paintPortrait(canvas, key){
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  const [hair,skin,shirt,acc] = PORTRAITS[key]();
+  drawBust(ctx, hair, skin, shirt, acc);
+}
+
+/* ============================================================
+   MAPA — vista satelital pixel-art de Mahahual (procedural)
+   ============================================================ */
+const MAP_COLS = 48, MAP_ROWS = 30;
+// 0 selva/tierra, 1 pueblo, 2 arena, 3 mar, 4 arrecife, 5 manglar, 6 muelle/puerto
+const mapTiles = [];
+(function buildMapLayout(){
+  for(let y=0;y<MAP_ROWS;y++){
+    const row = [];
+    for(let x=0;x<MAP_COLS;x++){
+      let t = 0;
+      const coastLine = 11 + Math.round(Math.sin(x*0.35)*1.5);
+      if(y < coastLine - 2) t = 0;           // selva
+      else if(y < coastLine) t = 1;          // pueblo / franja urbana
+      else if(y < coastLine + 2) t = 2;      // arena
+      else t = 3;                             // mar
+
+      // manglar en el extremo izquierdo cerca de la costa
+      if(x < 7 && y >= coastLine-1 && y <= coastLine+3) t = 5;
+      // puerto / muelle en el centro
+      if(x >= 21 && x <= 26 && y >= coastLine && y <= coastLine+6) t = 6;
+      // arrecife franja mar adentro
+      if(y >= coastLine + 9 && y <= coastLine + 12 && !(x>=21&&x<=26)) t = 4;
+
+      row.push(t);
+    }
+    mapTiles.push(row);
+  }
+})();
+
+function lerpColor(c1, c2, t){
+  const a = hexToRgb(c1), b = hexToRgb(c2);
+  const r = Math.round(a.r + (b.r-a.r)*t);
+  const g = Math.round(a.g + (b.g-a.g)*t);
+  const bl= Math.round(a.b + (b.b-a.b)*t);
+  return 'rgb('+r+','+g+','+bl+')';
+}
+function hexToRgb(hex){
+  hex = hex.replace('#','');
+  return { r: parseInt(hex.substring(0,2),16), g: parseInt(hex.substring(2,4),16), b: parseInt(hex.substring(4,6),16) };
+}
+
+function renderMap(){
+  const canvas = $('#mapCanvas');
+  const ctx = canvas.getContext('2d');
+  ctx.imageSmoothingEnabled = false;
+  const tw = canvas.width / MAP_COLS, th = canvas.height / MAP_ROWS;
+
+  const camT = state.bars.CAM/100;   // 0=critico,1=sano
+  const espT = state.bars.ESP/100;
+  const svT  = state.bars.SV/100;
+  const cvT  = state.bars.CV/100;
+  const ecoT = state.bars.ECO/100;
+
+  const seaColor    = lerpColor('#6B5B3E', '#1FA8A8', camT);       // agua sucia -> turquesa
+  const reefColor   = lerpColor('#5B5B63', '#FF7F6B', espT);        // arrecife muerto -> vivo
+  const mangroveCol = lerpColor('#5B4A32', '#1F6E45', camT);
+  const townColor   = lerpColor('#4A4038', '#D9A066', (svT+cvT)/2);
+  const portColor   = lerpColor('#5C5344', '#C9A54D', ecoT);
+  const sandColor   = lerpColor('#B8A97A', '#E8C77E', camT);
+  const jungleColor = '#164B30';
+
+  for(let y=0;y<MAP_ROWS;y++){
+    for(let x=0;x<MAP_COLS;x++){
+      const t = mapTiles[y][x];
+      let color;
+      switch(t){
+        case 0: color = jungleColor; break;
+        case 1: color = townColor; break;
+        case 2: color = sandColor; break;
+        case 3: color = seaColor; break;
+        case 4: color = reefColor; break;
+        case 5: color = mangroveCol; break;
+        case 6: color = portColor; break;
+      }
+      ctx.fillStyle = color;
+      ctx.fillRect(Math.floor(x*tw), Math.floor(y*th), Math.ceil(tw)+1, Math.ceil(th)+1);
+    }
+  }
+  // brillo de "ventanas" del pueblo si SV alto
+  ctx.fillStyle = 'rgba(255,240,180,'+ (0.15+0.25*svT) +')';
+  for(let y=0;y<MAP_ROWS;y++) for(let x=0;x<MAP_COLS;x++){
+    if(mapTiles[y][x]===1 && (x+y)%5===0){ ctx.fillRect(x*tw, y*th, tw*0.4, th*0.4); }
+  }
+
+  // filtro global de saturación / brillo según promedio de barras
+  const avg = (state.bars.CV+state.bars.SV+state.bars.ECO+state.bars.CAM+state.bars.ESP)/5/100;
+  const sat = 0.35 + 0.85*avg;
+  const bright = 0.65 + 0.45*avg;
+  canvas.style.filter = 'saturate('+sat.toFixed(2)+') brightness('+bright.toFixed(2)+')';
+}
+
+/* ============================================================
+   TYPEWRITER — texto letra por letra estilo RPG clásico
+   ============================================================ */
+function typewrite(el, text, speed, done){
+  el.textContent = '';
+  let i = 0;
+  speed = speed || 22;
+  clearInterval(el._twInterval);
+  el._twInterval = setInterval(() => {
+    el.textContent += text[i];
+    i++;
+    if(i >= text.length){
+      clearInterval(el._twInterval);
+      if(done) done();
+    }
+  }, speed);
+  return el._twInterval;
+}
+
+/* ============================================================
+   INTRO — scroll + historia
+   ============================================================ */
+const INTRO_TEXT = "Mahahual: el último paraíso del Caribe Mexicano. Un rincón donde la selva abraza al segundo arrecife de coral más grande del mundo. Pero el paraíso está en disputa. El turismo masivo, el dinero y la naturaleza chocan en una balanza frágil. Cada decisión que tomes escribirá el destino de esta costa... o la hundirá en el olvido.";
+
+function drawIntroFrame(offset){
+  const canvas = $('#introCanvas');
+  const ctx = canvas.getContext('2d');
+  ctx.imageSmoothingEnabled = false;
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  const tw = canvas.width/MAP_COLS, th = canvas.height/MAP_ROWS;
+  for(let y=0;y<MAP_ROWS;y++){
+    for(let x=0;x<MAP_COLS;x++){
+      const t = mapTiles[y][x];
+      const colors = {0:'#164B30',1:'#D9A066',2:'#E8C77E',3:'#1FA8A8',4:'#FF7F6B',5:'#1F6E45',6:'#C9A54D'};
+      ctx.fillStyle = colors[t];
+      ctx.fillRect(Math.floor(x*tw), Math.floor((y*th)+offset), Math.ceil(tw)+1, Math.ceil(th)+1);
+    }
+  }
+  // cielo por encima
+  ctx.fillStyle = '#BDEFF2';
+  ctx.fillRect(0,0,canvas.width, offset);
+}
+
+function playIntro(){
+  showScreen('screen-intro');
+  let offset = -canvas_h();
+  function canvas_h(){ return $('#introCanvas').height; }
+  const dur = 3200; const start = performance.now();
+  function anim(t){
+    const p = clamp((t-start)/dur, 0, 1);
+    offset = -canvas_h() * (1-p);
+    drawIntroFrame(offset);
+    if(p<1) requestAnimationFrame(anim);
+    else startIntroText();
+  }
+  requestAnimationFrame(anim);
+}
+function startIntroText(){
+  const span = $('#introTextSpan');
+  typewrite(span, INTRO_TEXT, 20, () => {
+    setTimeout(() => { goToRoleSelect(); }, 900);
+  });
+}
+function goToRoleSelect(){
+  clearInterval($('#introTextSpan')._twInterval);
+  showScreen('screen-role');
+}
+
+/* ============================================================
+   DATOS DEL JUEGO — 16 DECISIONES
+   Cada evento define contexto general + rama por rol.
+   effects: delta directo sobre las 5 barras (%)
+   ============================================================ */
+const EVENTS = [
+{
+  id:1, icon:'🚢', title:'Evento 1 — La Llegada del Megacrucero',
+  context: 'Una de las navieras más grandes del mundo ofrece incluir a Mahahual en su ruta principal, desembarcando a 15,000 turistas adicionales por semana, pero requiere dragar una sección del fondo marino para ampliar el muelle.',
+  ciudadano: {
+    companion: 'elena',
+    text: 'Elena te advierte: "Si apoyamos esto, todos en el pueblo tendrán trabajo esta temporada, desde los taxistas hasta los restaurantes. Pero el sistema de agua ya no da abasto para nosotros, imagínate con 15,000 personas más al día usando los baños. Además, el dragado levantará sedimentos que asfixiarán el coral cercano."',
+    options: [
+      { label:'Apoyar la expansión (priorizar empleo)', pros:'Economía +12%', cons:'Servicios Básicos −15% · Ambiente −10% · Especies −8%',
+        effects:{ CV:0, SV:-15, ECO:12, CAM:-10, ESP:-8 } },
+      { label:'Organizar un bloqueo (proteger los recursos)', pros:'Ambiente +5% · Servicios Básicos +5%', cons:'Economía −15% · Calidad de Vida −5%',
+        effects:{ CV:-5, SV:5, ECO:-15, CAM:5, ESP:0 } }
+    ]
+  },
+  inversionista: {
+    companion: 'carlos',
+    text: 'Carlos te advierte: "Tenemos el capital para co-financiar la ampliación del muelle. Las proyecciones de retorno de inversión son estratosféricas. Podemos hacerlo a la mala y rápido, o invertir una fracción de las ganancias en una micro-planta desalinizadora privada para no drenar la red del pueblo, aunque el daño al fondo marino por el dragado es inevitable."',
+    options: [
+      { label:'Co-financiar expansión rápida (maximizar ROI)', pros:'Economía +25%', cons:'Servicios Básicos −25% · Ambiente −18% · Especies −15% · Calidad de Vida −15%',
+        effects:{ CV:-15, SV:-25, ECO:25, CAM:-18, ESP:-15 } },
+      { label:'Expansión con infraestructura propia (mitigación parcial)', pros:'Economía +15% · Servicios Básicos +10%', cons:'Ambiente −15% · Especies −15%',
+        effects:{ CV:0, SV:10, ECO:15, CAM:-15, ESP:-15 } }
+    ]
+  }
+},
+{
+  id:2, icon:'🍂', title:'Evento 2 — La Marea Marrón (Crisis de Sargazo)',
+  context: 'Una llegada atípica y masiva de sargazo ha cubierto las playas principales. Ha comenzado a pudrirse, liberando gases tóxicos y tiñendo el agua de marrón.',
+  ciudadano: {
+    companion: 'elena',
+    text: 'Elena te advierte: "El olor es insoportable y los niños se están enfermando por el ácido sulfhídrico. El municipio no tiene manos suficientes. Podemos cerrar nuestros negocios unos días para limpiar la playa a mano entre todos, o esperar a que el gobierno resuelva, pero el turismo huirá."',
+    options: [
+      { label:'Cerrar negocios y limpiar a mano (esfuerzo comunitario)', pros:'Ambiente +10% · Calidad de Vida +8%', cons:'Economía −10% · Servicios Básicos −5%',
+        effects:{ CV:8, SV:-5, ECO:-10, CAM:10, ESP:0 } },
+      { label:'Esperar acción del gobierno (inacción)', pros:'Economía +0%', cons:'Ambiente −15% · Especies −10% · Calidad de Vida −15%',
+        effects:{ CV:-15, SV:0, ECO:0, CAM:-15, ESP:-10 } }
+    ]
+  },
+  inversionista: {
+    companion: 'carlos',
+    text: 'Carlos te advierte: "Nuestros hoteles frente al mar están recibiendo cancelaciones masivas. La solución rápida es meter retroexcavadoras a la playa hoy mismo, aunque cause erosión severa y aplaste nidos de tortuga. La otra opción es fondear barreras marinas; es caro y tardará un mes."',
+    options: [
+      { label:'Usar maquinaria pesada en la playa (solución destructiva)', pros:'Economía +18%', cons:'Ambiente −20% · Especies −25%',
+        effects:{ CV:0, SV:0, ECO:18, CAM:-20, ESP:-25 } },
+      { label:'Financiar barreras marinas de alta tecnología (visión a futuro)', pros:'Ambiente +15% · Especies +10%', cons:'Economía −20% · Calidad de Vida −5%',
+        effects:{ CV:-5, SV:0, ECO:-20, CAM:15, ESP:10 } }
+    ]
+  }
+},
+{
+  id:3, icon:'🚰', title:'Evento 3 — La Red de Agua al Límite',
+  context: 'La red de agua potable es insuficiente y de baja presión. No existe drenaje sanitario integral: la mayoría usa fosas sépticas que, por lo poroso del suelo, filtran contaminantes al acuífero y al mar.',
+  ciudadano: {
+    companion:'elena',
+    text:'Elena te dice: "Podemos organizarnos para exigir al municipio una red de biodigestores comunitarios, cuesta esfuerzo y tiempo. O seguimos como estamos y ahorramos ese dolor de cabeza por ahora."',
+    options:[
+      { label:'Exigir biodigestores comunitarios', pros:'Servicios Básicos +12% · Ambiente +6%', cons:'Calidad de Vida −4% (obras y molestias temporales)',
+        effects:{ CV:-4, SV:12, ECO:0, CAM:6, ESP:0 } },
+      { label:'Dejar las cosas como están', pros:'Calidad de Vida +0%', cons:'Servicios Básicos −8% · Ambiente −6%',
+        effects:{ CV:0, SV:-8, ECO:0, CAM:-6, ESP:0 } }
+    ]
+  },
+  inversionista:{
+    companion:'carlos',
+    text:'Carlos te dice: "Podemos construir una planta de tratamiento propia para nuestros desarrollos, protege tu marca y el acuífero. O seguimos usando fosas sépticas: más barato hoy, pero el riesgo legal y ambiental crece."',
+    options:[
+      { label:'Construir planta de tratamiento privada', pros:'Servicios Básicos +15% · Ambiente +10%', cons:'Economía −14%',
+        effects:{ CV:0, SV:15, ECO:-14, CAM:10, ESP:0 } },
+      { label:'Seguir con fosas sépticas (ahorro inmediato)', pros:'Economía +8%', cons:'Servicios Básicos −10% · Ambiente −12%',
+        effects:{ CV:0, SV:-10, ECO:8, CAM:-12, ESP:0 } }
+    ]
+  }
+},
+{
+  id:4, icon:'🗑️', title:'Evento 4 — El Basurero a Cielo Abierto',
+  context: 'El basurero local es a cielo abierto, está saturado y cercano a zonas de manglar, generando lixiviados que contaminan el subsuelo.',
+  ciudadano:{
+    companion:'elena',
+    text:'Elena: "Podemos presionar para un programa de separación y reciclaje comunitario, o mirar hacia otro lado mientras el basurero sigue creciendo junto al manglar."',
+    options:[
+      { label:'Impulsar reciclaje comunitario', pros:'Ambiente +8% · Calidad de Vida +4%', cons:'Servicios Básicos −3% (costos de operación)',
+        effects:{ CV:4, SV:-3, ECO:0, CAM:8, ESP:2 } },
+      { label:'No hacer nada por ahora', pros:'—', cons:'Ambiente −10% · Especies −6%',
+        effects:{ CV:0, SV:0, ECO:0, CAM:-10, ESP:-6 } }
+    ]
+  },
+  inversionista:{
+    companion:'carlos',
+    text:'Carlos: "Podemos financiar una planta de manejo de residuos moderna que además nos ahorra costos logísticos a largo plazo, o seguir pagando el basurero municipal barato y mirando hacia otro lado."',
+    options:[
+      { label:'Financiar planta de manejo de residuos', pros:'Ambiente +14% · Especies +6%', cons:'Economía −16%',
+        effects:{ CV:0, SV:0, ECO:-16, CAM:14, ESP:6 } },
+      { label:'Seguir usando el basurero municipal', pros:'Economía +6%', cons:'Ambiente −14% · Especies −8%',
+        effects:{ CV:0, SV:0, ECO:6, CAM:-14, ESP:-8 } }
+    ]
+  }
+},
+{
+  id:5, icon:'💡', title:'Evento 5 — Apagones en Temporada Alta',
+  context: 'La infraestructura eléctrica está rebasada por el crecimiento inmobiliario rápido. Los apagones y variaciones de voltaje son constantes.',
+  ciudadano:{
+    companion:'elena',
+    text:'Elena: "Podemos organizar un comité vecinal para exigir a la CFE inversión en la red, o resignarnos y comprar plantas de luz propias, cada quien por su cuenta."',
+    options:[
+      { label:'Exigir inversión pública en la red eléctrica', pros:'Servicios Básicos +10% · Calidad de Vida +5%', cons:'Economía −4% (tiempo y gestiones)',
+        effects:{ CV:5, SV:10, ECO:-4, CAM:0, ESP:0 } },
+      { label:'Cada quien compra su planta de luz', pros:'Calidad de Vida +3% (a corto plazo)', cons:'Servicios Básicos −6% · Economía −5% (gasto individual)',
+        effects:{ CV:3, SV:-6, ECO:-5, CAM:0, ESP:0 } }
+    ]
+  },
+  inversionista:{
+    companion:'carlos',
+    text:'Carlos: "Podemos instalar paneles solares y generadores propios para nuestros hoteles, o simplemente absorber los apagones como costo operativo mientras exprimimos la red pública."',
+    options:[
+      { label:'Instalar energía solar propia', pros:'Servicios Básicos +8% · Ambiente +6%', cons:'Economía −12% (inversión inicial)',
+        effects:{ CV:0, SV:8, ECO:-12, CAM:6, ESP:0 } },
+      { label:'Seguir dependiendo de la red pública', pros:'Economía +5%', cons:'Servicios Básicos −10% · Calidad de Vida −4%',
+        effects:{ CV:-4, SV:-10, ECO:5, CAM:0, ESP:0 } }
+    ]
+  }
+},
+{
+  id:6, icon:'🏥', title:'Evento 6 — Emergencia Médica',
+  context: 'Solo hay centros de salud de primer contacto; las emergencias graves requieren trasladarse a Chetumal, a más de una hora y media. Un accidente grave en el puerto pone a prueba el sistema.',
+  ciudadano:{
+    companion:'elena',
+    text:'Elena, con la voz quebrada: "Necesitamos exigir una ambulancia equipada y un médico de guardia permanente. Cuesta, pero la próxima vida que se pierda podría ser la de alguien que conoces."',
+    options:[
+      { label:'Exigir ambulancia y médico de guardia', pros:'Calidad de Vida +12%', cons:'Economía −8% (fondos comunitarios)',
+        effects:{ CV:12, SV:2, ECO:-8, CAM:0, ESP:0 } },
+      { label:'Confiar en el traslado a Chetumal como siempre', pros:'Economía +0%', cons:'Calidad de Vida −10%',
+        effects:{ CV:-10, SV:0, ECO:0, CAM:0, ESP:0 } }
+    ]
+  },
+  inversionista:{
+    companion:'carlos',
+    text:'Carlos: "Podemos patrocinar una clínica privada de urgencias cerca del puerto, buena imagen y protege a tus huéspedes y empleados. O delegamos el tema a las autoridades locales y seguimos enfocados en las obras."',
+    options:[
+      { label:'Patrocinar clínica de urgencias', pros:'Calidad de Vida +14%', cons:'Economía −15%',
+        effects:{ CV:14, SV:0, ECO:-15, CAM:0, ESP:0 } },
+      { label:'Delegar el tema a las autoridades', pros:'Economía +4%', cons:'Calidad de Vida −8%',
+        effects:{ CV:-8, SV:0, ECO:4, CAM:0, ESP:0 } }
+    ]
+  }
+},
+{
+  id:7, icon:'🏫', title:'Evento 7 — Educación sin Techo',
+  context: 'La infraestructura educativa pública es limitada hasta el nivel medio superior; muchos jóvenes deben salir del pueblo para seguir estudiando.',
+  ciudadano:{
+    companion:'elena',
+    text:'Elena: "Podemos organizar una cooperativa de padres para ampliar la escuela, o aceptar que nuestros hijos tendrán que irse si quieren estudiar más."',
+    options:[
+      { label:'Organizar cooperativa para ampliar la escuela', pros:'Calidad de Vida +10%', cons:'Economía −6%',
+        effects:{ CV:10, SV:0, ECO:-6, CAM:0, ESP:0 } },
+      { label:'Aceptar la situación actual', pros:'—', cons:'Calidad de Vida −6%',
+        effects:{ CV:-6, SV:0, ECO:0, CAM:0, ESP:0 } }
+    ]
+  },
+  inversionista:{
+    companion:'carlos',
+    text:'Carlos: "Un centro de capacitación turística financiado por nosotros nos daría personal mejor calificado a futuro, o podemos seguir contratando personal de fuera, más caro pero sin invertir hoy."',
+    options:[
+      { label:'Financiar centro de capacitación turística', pros:'Calidad de Vida +9% · Economía +4% (a mediano plazo)', cons:'Economía −10% (inversión inicial)',
+        effects:{ CV:9, SV:0, ECO:-6, CAM:0, ESP:0 } },
+      { label:'Seguir contratando personal foráneo', pros:'—', cons:'Calidad de Vida −7%',
+        effects:{ CV:-7, SV:0, ECO:0, CAM:0, ESP:0 } }
+    ]
+  }
+},
+{
+  id:8, icon:'🏠', title:'Evento 8 — El Costo de Vivir en el Paraíso',
+  context: 'La dolarización indirecta por el turismo de cruceros encarece la vivienda, los alimentos y los servicios para la gente local.',
+  ciudadano:{
+    companion:'elena',
+    text:'Elena: "Podemos exigir un tope de renta para vivienda local, o quedarnos callados por miedo a espantar la inversión que nos da empleo."',
+    options:[
+      { label:'Exigir control de rentas para locales', pros:'Calidad de Vida +10%', cons:'Economía −8% (menos interés de inversionistas)',
+        effects:{ CV:10, SV:0, ECO:-8, CAM:0, ESP:0 } },
+      { label:'No exigir nada, aguantar la subida de precios', pros:'Economía +5%', cons:'Calidad de Vida −12%',
+        effects:{ CV:-12, SV:0, ECO:5, CAM:0, ESP:0 } }
+    ]
+  },
+  inversionista:{
+    companion:'carlos',
+    text:'Carlos: "Podemos destinar parte de las utilidades a vivienda para empleados, mejora retención de personal. O seguimos con salarios estándar y dejamos que el mercado decida."',
+    options:[
+      { label:'Financiar vivienda para empleados', pros:'Calidad de Vida +11%', cons:'Economía −10%',
+        effects:{ CV:11, SV:0, ECO:-10, CAM:0, ESP:0 } },
+      { label:'Mantener salarios estándar de mercado', pros:'Economía +6%', cons:'Calidad de Vida −9%',
+        effects:{ CV:-9, SV:0, ECO:6, CAM:0, ESP:0 } }
+    ]
+  }
+},
+{
+  id:9, icon:'🎣', title:'Evento 9 — La Pesca en Declive',
+  context: 'La pesca comercial y de subsistencia, históricamente importante, está en declive por sobreexplotación y por la transición económica hacia el turismo.',
+  ciudadano:{
+    companion:'elena',
+    text:'Elena: "Los pescadores viejos dicen que ya no hay lo de antes. Podemos apoyar cuotas de pesca sustentable, aunque signifique menos captura hoy, o seguir pescando igual mientras haya algo que sacar."',
+    options:[
+      { label:'Apoyar cuotas de pesca sustentable', pros:'Especies +12% · Ambiente +4%', cons:'Economía −8%',
+        effects:{ CV:0, SV:0, ECO:-8, CAM:4, ESP:12 } },
+      { label:'Seguir pescando sin restricciones', pros:'Economía +6%', cons:'Especies −14%',
+        effects:{ CV:0, SV:0, ECO:6, CAM:0, ESP:-14 } }
+    ]
+  },
+  inversionista:{
+    companion:'carlos',
+    text:'Carlos: "Podemos financiar un programa de pesca-turismo sustentable con los pescadores locales, diversifica ingresos y protege el arrecife. O ignoramos el tema, no es nuestro giro de negocio."',
+    options:[
+      { label:'Financiar programa de pesca-turismo sustentable', pros:'Especies +10% · Economía +6%', cons:'Economía −10% (inversión inicial, neto leve)',
+        effects:{ CV:0, SV:0, ECO:-4, CAM:2, ESP:10 } },
+      { label:'Ignorar el tema, no es prioridad', pros:'—', cons:'Especies −10%',
+        effects:{ CV:0, SV:0, ECO:0, CAM:0, ESP:-10 } }
+    ]
+  }
+},
+{
+  id:10, icon:'🏨', title:'Evento 10 — Boutique vs. Todo Incluido',
+  context: 'Los hoteles boutique y restaurantes del malecón compiten en desventaja contra el modelo all-inclusive de los cruceros, que concentra el gasto turístico en pocos operadores.',
+  ciudadano:{
+    companion:'elena',
+    text:'Elena: "Podemos organizar una campaña para que los cruceristas bajen y consuman en el pueblo, o resignarnos a que el dinero se quede encerrado en el barco."',
+    options:[
+      { label:'Impulsar campaña "consume en el pueblo"', pros:'Economía +10% · Calidad de Vida +3%', cons:'—',
+        effects:{ CV:3, SV:0, ECO:10, CAM:0, ESP:0 } },
+      { label:'No hacer nada al respecto', pros:'—', cons:'Economía −6%',
+        effects:{ CV:0, SV:0, ECO:-6, CAM:0, ESP:0 } }
+    ]
+  },
+  inversionista:{
+    companion:'carlos',
+    text:'Carlos: "Podemos negociar con la naviera paquetes que incluyan comercios locales, mejora relaciones públicas. O firmamos un contrato de exclusividad que maximiza nuestras ganancias pero asfixia al comercio local."',
+    options:[
+      { label:'Negociar paquetes que incluyan comercio local', pros:'Calidad de Vida +8% · Economía +5%', cons:'Economía −6% (renunciar a exclusividad)',
+        effects:{ CV:8, SV:0, ECO:-1, CAM:0, ESP:0 } },
+      { label:'Firmar exclusividad con la naviera', pros:'Economía +16%', cons:'Calidad de Vida −10%',
+        effects:{ CV:-10, SV:0, ECO:16, CAM:0, ESP:0 } }
+    ]
+  }
+},
+{
+  id:11, icon:'🏖️', title:'Evento 11 — Las Dunas que Desaparecen',
+  context: 'Las dunas costeras ayudan a evitar la erosión y protegen la costa, pero la urbanización ha reducido estas áreas naturales y modificado su dinámica.',
+  ciudadano:{
+    companion:'elena',
+    text:'Elena: "Podemos exigir que se respete la línea de duna en nuevas construcciones, o dejar que sigan construyendo hasta la orilla porque da más vistas al mar y renta más caro."',
+    options:[
+      { label:'Exigir respeto a la línea de duna', pros:'Ambiente +8%', cons:'Economía −6% (menos terreno construible)',
+        effects:{ CV:0, SV:0, ECO:-6, CAM:8, ESP:2 } },
+      { label:'Permitir construir hasta la orilla', pros:'Economía +8%', cons:'Ambiente −12% · Especies −4%',
+        effects:{ CV:0, SV:0, ECO:8, CAM:-12, ESP:-4 } }
+    ]
+  },
+  inversionista:{
+    companion:'carlos',
+    text:'Carlos: "Podemos retranquear la construcción del nuevo hotel para preservar la duna, buena reputación ambiental. O construimos pegado a la playa para maximizar la vista y el precio por noche."',
+    options:[
+      { label:'Retranquear construcción, preservar la duna', pros:'Ambiente +10%', cons:'Economía −12%',
+        effects:{ CV:0, SV:0, ECO:-12, CAM:10, ESP:2 } },
+      { label:'Construir pegado a la playa', pros:'Economía +18%', cons:'Ambiente −14% · Especies −6%',
+        effects:{ CV:0, SV:0, ECO:18, CAM:-14, ESP:-6 } }
+    ]
+  }
+},
+{
+  id:12, icon:'💧', title:'Evento 12 — La Planta Desalinizadora y el Acuífero',
+  context: 'El uso de una planta desalinizadora y pozos para abastecer el crecimiento turístico ha sido uno de los puntos más criticados en Mahahual, por su presión sobre el acuífero subterráneo.',
+  ciudadano:{
+    companion:'elena',
+    text:'Elena: "Podemos exigir estudios independientes sobre el acuífero antes de permitir más pozos, o dejar que sigan perforando porque al menos así llega más agua a la red del pueblo."',
+    options:[
+      { label:'Exigir estudios independientes antes de más pozos', pros:'Ambiente +8%', cons:'Servicios Básicos −4% (retraso en soluciones de agua)',
+        effects:{ CV:0, SV:-4, ECO:0, CAM:8, ESP:2 } },
+      { label:'Permitir más pozos sin estudios', pros:'Servicios Básicos +8%', cons:'Ambiente −12%',
+        effects:{ CV:0, SV:8, ECO:0, CAM:-12, ESP:-2 } }
+    ]
+  },
+  inversionista:{
+    companion:'carlos',
+    text:'Carlos: "Podemos invertir en una desalinizadora de bajo impacto certificada, más cara pero defendible ante auditorías ambientales. O perforamos pozos convencionales, rápido y barato."',
+    options:[
+      { label:'Invertir en desalinizadora de bajo impacto', pros:'Ambiente +10% · Servicios Básicos +6%', cons:'Economía −14%',
+        effects:{ CV:0, SV:6, ECO:-14, CAM:10, ESP:0 } },
+      { label:'Perforar pozos convencionales', pros:'Economía +10% · Servicios Básicos +6%', cons:'Ambiente −16%',
+        effects:{ CV:0, SV:6, ECO:10, CAM:-16, ESP:-4 } }
+    ]
+  }
+},
+{
+  id:13, icon:'🐢', title:'Evento 13 — Temporada de Anidación',
+  context: 'Es temporada de anidación de tortugas marinas, incluida la tortuga carey, en peligro crítico. Las luces artificiales de la costa desorientan a las crías recién nacidas.',
+  ciudadano:{
+    companion:'elena',
+    text:'Elena: "Podemos organizar brigadas nocturnas para proteger los nidos y apagar luces innecesarias, o seguir con las fiestas de playa como cada año."',
+    options:[
+      { label:'Organizar brigadas de protección de nidos', pros:'Especies +14%', cons:'Economía −6% (menos eventos nocturnos)',
+        effects:{ CV:0, SV:0, ECO:-6, CAM:0, ESP:14 } },
+      { label:'Mantener las fiestas de playa nocturnas', pros:'Economía +6%', cons:'Especies −16%',
+        effects:{ CV:0, SV:0, ECO:6, CAM:0, ESP:-16 } }
+    ]
+  },
+  inversionista:{
+    companion:'carlos',
+    text:'Carlos: "Podemos instalar iluminación ámbar de bajo impacto en los hoteles frente a la playa, cuesta pero es buena imagen de marca. O mantenemos la iluminación estándar, más barata y brillante para los huéspedes."',
+    options:[
+      { label:'Instalar iluminación de bajo impacto', pros:'Especies +12%', cons:'Economía −10%',
+        effects:{ CV:0, SV:0, ECO:-10, CAM:0, ESP:12 } },
+      { label:'Mantener iluminación estándar', pros:'Economía +5%', cons:'Especies −14%',
+        effects:{ CV:0, SV:0, ECO:5, CAM:0, ESP:-14 } }
+    ]
+  }
+},
+{
+  id:14, icon:'🐬', title:'Evento 14 — Lanchas Rápidas y Manatíes',
+  context: 'El tráfico creciente de lanchas rápidas para tours pone en riesgo al manatí del Caribe y a los delfines costeros que habitan cerca del manglar.',
+  ciudadano:{
+    companion:'elena',
+    text:'Elena: "Podemos pedir límites de velocidad para las lanchas cerca del manglar, o dejar que los guías sigan corriendo para hacer más tours al día y ganar más propinas."',
+    options:[
+      { label:'Pedir límites de velocidad en zonas de manglar', pros:'Especies +10%', cons:'Economía −5% (menos tours por día)',
+        effects:{ CV:0, SV:0, ECO:-5, CAM:2, ESP:10 } },
+      { label:'Dejar que los tours sigan a máxima velocidad', pros:'Economía +5%', cons:'Especies −12%',
+        effects:{ CV:0, SV:0, ECO:5, CAM:0, ESP:-12 } }
+    ]
+  },
+  inversionista:{
+    companion:'carlos',
+    text:'Carlos: "Podemos certificar nuestros tours como avistamiento responsable con límites de velocidad, atrae turismo de nicho de mayor gasto. O mantenemos tours rápidos de alto volumen y bajo precio."',
+    options:[
+      { label:'Certificar tours de avistamiento responsable', pros:'Especies +10% · Economía +4%', cons:'—',
+        effects:{ CV:0, SV:0, ECO:4, CAM:2, ESP:10 } },
+      { label:'Mantener tours rápidos de alto volumen', pros:'Economía +10%', cons:'Especies −14%',
+        effects:{ CV:0, SV:0, ECO:10, CAM:0, ESP:-14 } }
+    ]
+  }
+},
+{
+  id:15, icon:'🌀', title:'Evento 15 — Se Acerca un Huracán',
+  context: 'Un huracán categoría 2 se aproxima a la costa. El manglar es la barrera natural histórica, pero algunos proponen un muro de contención de concreto frente al malecón.',
+  ciudadano:{
+    companion:'elena',
+    text:'Elena: "Los abuelos siempre dicen que el manglar nos protegió de huracanes antes de que existiera el muelle. Podemos reforestar manglar como barrera viva, o pedir un muro de concreto que se ve más fuerte pero destruye la playa."',
+    options:[
+      { label:'Reforestar manglar como barrera natural', pros:'Ambiente +12% · Especies +8%', cons:'Calidad de Vida −4% (protección no inmediata)',
+        effects:{ CV:-4, SV:0, ECO:0, CAM:12, ESP:8 } },
+      { label:'Pedir un muro de concreto', pros:'Calidad de Vida +6% (sensación de seguridad inmediata)', cons:'Ambiente −14% · Especies −10%',
+        effects:{ CV:6, SV:0, ECO:0, CAM:-14, ESP:-10 } }
+    ]
+  },
+  inversionista:{
+    companion:'carlos',
+    text:'Carlos: "Podemos financiar la reforestación de manglar frente a nuestros desarrollos, protección a largo plazo y buena imagen. O construimos un muro de contención de concreto, más caro pero se ve como una solución inmediata para tranquilizar a los huéspedes."',
+    options:[
+      { label:'Financiar reforestación de manglar', pros:'Ambiente +14% · Especies +10%', cons:'Economía −10%',
+        effects:{ CV:0, SV:0, ECO:-10, CAM:14, ESP:10 } },
+      { label:'Construir muro de contención de concreto', pros:'Calidad de Vida +5%', cons:'Economía −18% · Ambiente −12% · Especies −8%',
+        effects:{ CV:5, SV:0, ECO:-18, CAM:-12, ESP:-8 } }
+    ]
+  }
+},
+{
+  id:16, icon:'📋', title:'Evento 16 — Fiscalización de Vertidos Ilegales',
+  context: 'Se detectan hoteles que vierten aguas negras sin tratar directamente al manglar y al mar para ahorrar costos de operación. Es momento de decidir qué hacer al respecto.',
+  ciudadano:{
+    companion:'elena',
+    text:'Elena: "Podemos denunciar públicamente a los hoteles que contaminan, aunque eso genere tensión con quienes dan empleo aquí, o quedarnos callados para no meternos en problemas."',
+    options:[
+      { label:'Denunciar públicamente los vertidos ilegales', pros:'Ambiente +12% · Especies +6%', cons:'Economía −8% (tensión con empleadores)',
+        effects:{ CV:0, SV:0, ECO:-8, CAM:12, ESP:6 } },
+      { label:'Quedarse callado para evitar problemas', pros:'—', cons:'Ambiente −12% · Especies −8%',
+        effects:{ CV:0, SV:0, ECO:0, CAM:-12, ESP:-8 } }
+    ]
+  },
+  inversionista:{
+    companion:'carlos',
+    text:'Carlos: "Podemos auditar y exigir tratamiento de aguas a todos nuestros socios hoteleros, protege la reputación de toda la zona a largo plazo. O hacemos vista gorda porque exhibir a otros también expone nuestras propias prácticas."',
+    options:[
+      { label:'Auditar y exigir tratamiento de aguas', pros:'Ambiente +14% · Especies +8%', cons:'Economía −10%',
+        effects:{ CV:0, SV:0, ECO:-10, CAM:14, ESP:8 } },
+      { label:'Hacer vista gorda ante los vertidos', pros:'Economía +6%', cons:'Ambiente −16% · Especies −10%',
+        effects:{ CV:0, SV:0, ECO:6, CAM:-16, ESP:-10 } }
+    ]
+  }
+}
+];
+
+/* ============================================================
+   FLUJO DE JUEGO
+   ============================================================ */
+function initGame(role){
+  state.role = role;
+  state.bars = { CV:50, SV:50, ECO:50, CAM:50, ESP:50 };
+  state.turn = 0;
+  state.highStreak = 0;
+  state.log = [];
+  state.finished = false;
+  state.eventOrder = EVENTS.map(e => e.id); // orden fijo narrativo
+
+  showScreen('screen-game');
+  updateHUD();
+  renderMap();
+  paintPortrait($('#companionPortrait'), role);
+
+  const companion = role === 'ciudadano' ? 'Elena' : 'Carlos';
+  $('#companionName').textContent = companion;
+  const introLine1 = role === 'ciudadano'
+    ? 'Bien, ya estamos aquí. Esos indicadores de arriba son nuestras preocupaciones principales de la ciudad. Mantén un ojo en ellos. Cuando aparezcan los problemas, te daré los pros y contras para que no nos lleves a la ruina.'
+    : 'Bienvenido al terreno, jefe. Los indicadores de arriba muestran el estado de la zona. En cada proyecto te desglosaré los porcentajes de impacto ambiental y social. El dinero importa, pero no puedes operar una ciudad muerta. Solo ten cuidado…';
+  const introLine2 = role === 'ciudadano'
+    ? 'Desgraciadamente no tenemos tantos datos ni influencia, por lo que tendrás que confiar en tu criterio y hacer lo mejor que puedas.'
+    : 'En cada proyecto te desglosaré los porcentajes de impacto ambiental y social según nuestros analistas.';
+
+  typewrite($('#dialogueText'), introLine1, 16, () => {
+    setTimeout(() => {
+      typewrite($('#dialogueText'), introLine2, 16, () => {
+        setTimeout(() => nextEvent(), 1200);
+      });
+    }, 700);
+  });
+}
+
+function updateHUD(){
+  Object.keys(state.bars).forEach(key => {
+    const val = clamp(Math.round(state.bars[key]), 0, 100);
+    const statEl = document.querySelector('.stat[data-key="'+key+'"]');
+    statEl.querySelector('.stat-val').textContent = val + '%';
+    const fill = statEl.querySelector('.stat-bar-fill');
+    fill.style.width = val + '%';
+    fill.style.background = val < 25 ? '#D64545' : STAT_META[key].color;
+  });
+  $('#turnBadge').textContent = 'DÍA ' + state.turn + ' / 16';
+}
+
+function nextEvent(){
+  if(checkGameOver()) return;
+  if(checkVictory()) return;
+  if(state.turn >= EVENTS.length){ endGame('final'); return; }
+
+  const evt = EVENTS[state.turn];
+  openDecision(evt);
+}
+
+function openDecision(evt){
+  const branch = evt[state.role];
+  $('#decisionTitle').textContent = evt.icon + ' ' + evt.title;
+  $('#decisionContext').textContent = evt.context;
+  $('#decisionCompanion').textContent = branch.text;
+  const wrap = $('#optionsWrap');
+  wrap.innerHTML = '';
+  branch.options.forEach((opt, idx) => {
+    const btn = document.createElement('button');
+    btn.className = 'option';
+    btn.innerHTML = '<span class="option-label">'+String.fromCharCode(65+idx)+') '+opt.label+'</span>'+
+      '<div class="option-pros">👍 '+opt.pros+'</div>'+
+      '<div class="option-cons">👎 '+opt.cons+'</div>';
+    btn.onclick = () => chooseOption(evt, branch, opt, idx);
+    wrap.appendChild(btn);
+  });
+  $('#decisionModal').classList.add('active');
+}
+
+function chooseOption(evt, branch, opt, idx){
+  $('#decisionModal').classList.remove('active');
+  state.log.push({
+    turn: state.turn+1,
+    title: evt.title,
+    choice: String.fromCharCode(65+idx)+') '+opt.label,
+    effects: opt.effects
+  });
+  animateEffects(opt.effects, () => {
+    state.turn++;
+    updateHUD();
+    checkStreak();
+    setTimeout(() => nextEvent(), 300);
+  });
+}
+
+function animateEffects(effects, done){
+  // Se anima el cambio en 7 pasos (representando 7 días de la semana),
+  // como pide el documento de diseño.
+  const steps = 7;
+  const startBars = Object.assign({}, state.bars);
+  const targetBars = {};
+  Object.keys(state.bars).forEach(k => {
+    targetBars[k] = clamp(state.bars[k] + (effects[k]||0), 0, 100);
+  });
+  let step = 0;
+  const iv = setInterval(() => {
+    step++;
+    Object.keys(state.bars).forEach(k => {
+      state.bars[k] = startBars[k] + (targetBars[k]-startBars[k]) * (step/steps);
+    });
+    updateHUD();
+    renderMap();
+    if(step >= steps){
+      clearInterval(iv);
+      Object.keys(state.bars).forEach(k => state.bars[k] = targetBars[k]);
+      updateHUD();
+      renderMap();
+      done();
+    }
+  }, 90);
+}
+
+function checkStreak(){
+  const allHigh = Object.values(state.bars).every(v => v >= 75);
+  state.highStreak = allHigh ? state.highStreak+1 : 0;
+}
+
+function checkGameOver(){
+  const collapsed = Object.entries(state.bars).find(([k,v]) => v <= 0);
+  if(collapsed){
+    endGame('derrota', collapsed[0]);
+    return true;
+  }
+  return false;
+}
+
+function checkVictory(){
+  if(state.highStreak >= 3){
+    endGame('victoria');
+    return true;
+  }
+  return false;
+}
+
+/* ============================================================
+   PANTALLA FINAL
+   ============================================================ */
+function endGame(kind, collapsedKey){
+  state.finished = true;
+  showScreen('screen-end');
+
+  const titleEl = $('#endTitle');
+  const summaryEl = $('#endSummary');
+
+  if(kind === 'derrota'){
+    titleEl.textContent = '💀 COLAPSO SOCIOECOLÓGICO';
+    summaryEl.innerHTML = '<p>'+STAT_META[collapsedKey].name+' llegó a 0%. El equilibrio frágil de Mahahual se rompió por completo: los servicios colapsan, la economía se derrumba o el ecosistema muere — y la comunidad entera paga el precio. No hay desarrollo posible sobre una base destruida. Esta es la crudeza real de gestionar un territorio: ignorar una sola dimensión, tarde o temprano, hunde a todas las demás.</p>';
+  } else if(kind === 'victoria'){
+    titleEl.textContent = '🌺 VICTORIA SUSTENTABLE';
+    summaryEl.innerHTML = '<p>Mantuviste las cinco dimensiones de Mahahual por encima del 75% de forma sostenida. Lograste lo que pocos consiguen: crecimiento económico sin sacrificar a la comunidad ni al ecosistema que la sostiene. El equilibrio nunca es automático — es el resultado de decisiones deliberadas, turno tras turno.</p>';
+  } else {
+    const avg = (state.bars.CV+state.bars.SV+state.bars.ECO+state.bars.CAM+state.bars.ESP)/5;
+    let msg;
+    if(avg >= 65) msg = 'Mahahual sobrevivió las 16 decisiones en un estado razonablemente estable, aunque sin alcanzar la plena sustentabilidad. El equilibrio sigue siendo frágil.';
+    else if(avg >= 40) msg = 'Mahahual llegó al final de las 16 decisiones en un equilibrio precario. Ninguna dimensión colapsó del todo, pero las tensiones entre desarrollo y conservación quedaron sin resolver.';
+    else msg = 'Mahahual sobrevivió por poco. El costo humano y ambiental acumulado a lo largo de las 16 decisiones fue alto, y la comunidad quedó al borde del colapso.';
+    titleEl.textContent = '🏁 FIN DE LA SIMULACIÓN';
+    summaryEl.innerHTML = '<p>'+msg+'</p>';
+  }
+
+  const statsWrap = $('#endStatsFinal');
+  statsWrap.innerHTML = '';
+  Object.keys(state.bars).forEach(k => {
+    const div = document.createElement('div');
+    div.style.textAlign = 'center';
+    div.innerHTML = '<div style="font-size:0.85em;">'+STAT_META[k].name+'</div><div style="font-family:var(--font-pixel); font-size:1.1em; color:'+STAT_META[k].color+';">'+Math.round(state.bars[k])+'%</div>';
+    statsWrap.appendChild(div);
+  });
+
+  const logWrap = $('#endLog');
+  logWrap.innerHTML = '<strong>Historial de decisiones ('+(state.role==='ciudadano'?'Ciudadano':'Inversionista')+'):</strong>';
+  state.log.forEach(entry => {
+    const div = document.createElement('div');
+    div.textContent = 'Día '+entry.turn+' — '+entry.title+': '+entry.choice;
+    logWrap.appendChild(div);
+  });
+}
+
+/* ============================================================
+   EVENTOS DE UI
+   ============================================================ */
+window.addEventListener('DOMContentLoaded', () => {
+  paintPortrait($('#panel-ciudadano .role-portrait'), 'ciudadano');
+  paintPortrait($('#panel-inversionista .role-portrait'), 'inversionista');
+
+  $('#btnStart').onclick = () => playIntro();
+  $('#introSkip').onclick = () => goToRoleSelect();
+
+  $all('.role-panel').forEach(panel => {
+    panel.onclick = () => initGame(panel.dataset.role);
+  });
+
+  $('#btnReplay').onclick = () => showScreen('screen-title');
+});
+</script>
+</body>
+</html>
